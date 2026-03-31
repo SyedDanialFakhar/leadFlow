@@ -1,3 +1,4 @@
+// src/types/lead.ts
 export type LeadStatus = 'new' | 'assessed' | 'called' | 'converted' | 'closed' | 'deleted';
 export type EnrichmentStatus = 'pending' | 'enriched' | 'not_found' | 'failed';
 export type Platform = 'seek' | 'linkedin';

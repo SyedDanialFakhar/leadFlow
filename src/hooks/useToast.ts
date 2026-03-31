@@ -1,0 +1,6 @@
+// src/hooks/useToast.ts
+import { useToastContext } from '@/components/ui/ToastProvider';
+
+export function useToast() {
+  return useToastContext();
+}

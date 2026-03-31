@@ -96,6 +96,46 @@ export default function SettingsPage() {
             </div>
           ))}
         </Section>
+
+        <Section title="Scraping Preferences">
+          <div className="flex items-end gap-3">
+            <div className="flex-1">
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Default Min Age (Days)</label>
+              <input
+                type="number"
+                className={inputCls}
+                value={getValue(SETTING_KEYS.DEFAULT_MIN_AGE)}
+                onChange={(e) => setEdits({ ...edits, [SETTING_KEYS.DEFAULT_MIN_AGE]: e.target.value })}
+                placeholder="14"
+              />
+            </div>
+            <button
+              onClick={() => handleSave(SETTING_KEYS.DEFAULT_MIN_AGE)}
+              disabled={!isDirty(SETTING_KEYS.DEFAULT_MIN_AGE) || isSaving}
+              className="shrink-0 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+            >
+              Save
+            </button>
+          </div>
+          <div className="flex items-end gap-3">
+            <div className="flex-1">
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Default Search Role</label>
+              <input
+                className={inputCls}
+                value={getValue(SETTING_KEYS.DEFAULT_ROLE)}
+                onChange={(e) => setEdits({ ...edits, [SETTING_KEYS.DEFAULT_ROLE]: e.target.value })}
+                placeholder="Business Development Manager"
+              />
+            </div>
+            <button
+              onClick={() => handleSave(SETTING_KEYS.DEFAULT_ROLE)}
+              disabled={!isDirty(SETTING_KEYS.DEFAULT_ROLE) || isSaving}
+              className="shrink-0 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+            >
+              Save
+            </button>
+          </div>
+        </Section>
       </div>
     </Layout>
   );
