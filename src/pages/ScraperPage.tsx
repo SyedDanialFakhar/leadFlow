@@ -24,25 +24,41 @@ export default function ScraperPage() {
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Platform</label>
-              <select className={selectCls} value={config.platform} onChange={(e) => setConfig({ ...config, platform: e.target.value as 'seek' | 'linkedin' })}>
+              <select disabled className={`${selectCls} opacity-50`} value={config.platform} onChange={(e) => setConfig({ ...config, platform: e.target.value as 'seek' | 'linkedin' })}>
                 {PLATFORMS.map((p) => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">City</label>
-              <select className={selectCls} value={config.city} onChange={(e) => setConfig({ ...config, city: e.target.value as 'Melbourne' | 'Sydney' | 'Brisbane' })}>
-                {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Location</label>
+              <select disabled className={`${selectCls} opacity-50`} value={config.city} onChange={(e) => setConfig({ ...config, city: e.target.value as 'Melbourne' | 'Sydney' | 'Brisbane' })}>
+                <option value={config.city}>Australia (Nationwide)</option>
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Role</label>
-              <select className={selectCls} value={config.roleQuery} onChange={(e) => setConfig({ ...config, roleQuery: e.target.value })}>
-                {ROLE_QUERIES.map((r) => <option key={r} value={r}>{r}</option>)}
-              </select>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Job Title / Keywords</label>
+              <input 
+                type="text"
+                className={selectCls} 
+                value={config.roleQuery} 
+                onChange={(e) => setConfig({ ...config, roleQuery: e.target.value })}
+                placeholder="e.g. Sales Manager"
+              />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Min Age (days)</label>
-              <input type="number" className={selectCls} value={config.minAgeDays} onChange={(e) => setConfig({ ...config, minAgeDays: parseInt(e.target.value) || 14 })} min={1} />
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Search Coverage</label>
+              <div className="flex h-[38px] items-center gap-2">
+                <input 
+                  type="checkbox" 
+                  id="bypass"
+                  disabled
+                  checked={config.bypassFilters} 
+                />
+                <label htmlFor="bypass" className="text-xs text-muted-foreground opacity-50">Show all Australian results</label>
+              </div>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Min Age (Frozen)</label>
+              <input disabled type="number" className={`${selectCls} opacity-50`} value={config.minAgeDays} />
             </div>
           </div>
           <div className="mt-4">
@@ -65,7 +81,11 @@ export default function ScraperPage() {
             <div className="flex items-center justify-between border-b px-5 py-3">
               <div>
                 <h3 className="font-semibold text-card-foreground">Results Preview</h3>
-                <p className="text-xs text-muted-foreground">{results.length} passed filters, {filteredCount} filtered out</p>
+                <p className="text-xs text-muted-foreground">
+                  {config.bypassFilters 
+                    ? `Showing all ${results.length} results (unfiltered)` 
+                    : `${results.length} passed filters, ${filteredCount} filtered out`}
+                </p>
               </div>
               <div className="flex gap-2">
                 <button onClick={discard} className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted">

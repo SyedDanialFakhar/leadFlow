@@ -49,20 +49,32 @@ export async function runApifyScrape(config: ScrapeConfig): Promise<ScrapeResult
   const datasetRes = await fetch(
     `https://api.apify.com/v2/acts/${actorId}/runs/${runId}/dataset/items?token=${token}`
   );
+  
+  if (!datasetRes.ok) {
+    throw new Error(`Failed to fetch dataset: ${datasetRes.statusText}`);
+  }
+
   const items = await datasetRes.json();
 
-  return (items as Record<string, unknown>[]).map((item) => mapApifyItemToResult(item, config));
+  if (!Array.isArray(items)) {
+    console.error('Apify items response:', items);
+    if (items && typeof items === 'object' && 'error' in items) {
+      throw new Error(`Apify Error: ${JSON.stringify(items.error)}`);
+    }
+    throw new Error('Unexpected response format from Apify: Dataset items is not an array.');
+  }
+
+  if (items.length === 0) {
+    return [];
+  }
+
+  return items.map((item) => mapApifyItemToResult(item as Record<string, unknown>, config));
 }
 
 function buildSeekUrl(config: ScrapeConfig): string {
-  const cityMap: Record<string, string> = {
-    Melbourne: 'Melbourne+VIC',
-    Sydney: 'Sydney+NSW',
-    Brisbane: 'Brisbane+QLD',
-  };
   const query = encodeURIComponent(config.roleQuery);
-  const location = cityMap[config.city] ?? config.city;
-  return `https://www.seek.com.au/${query}-jobs/in-${location}?sortmode=ListedDate`;
+  // Searching nationwide in Australia as requested
+  return `https://www.seek.com.au/${query}-jobs?sortmode=ListedDate`;
 }
 
 function getSeekPageFunction(): string {

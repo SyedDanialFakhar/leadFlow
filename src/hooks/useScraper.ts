@@ -15,6 +15,7 @@ export function useScraper() {
     city: 'Melbourne',
     roleQuery: 'Business Development Manager',
     minAgeDays: MIN_AD_AGE_DAYS,
+    bypassFilters: true, // Default to true as requested to "see everything"
   });
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState<ScrapeProgress[]>([]);
@@ -67,18 +68,22 @@ export function useScraper() {
 
       addLog(`Found ${rawResults.length} raw job ads`, 'success');
 
-      const { passed, filtered } = filterScrapeResults(rawResults, config.minAgeDays);
-      setFilteredCount(filtered.length);
-
-      addLog(`Filtered out ${filtered.length} ads (agency/age/size)`, 'warning');
-      addLog(`${passed.length} leads ready for review`, 'success');
-
-      setResults(passed);
+      if (config.bypassFilters) {
+        addLog('Bypassing filters: Showing all results', 'warning');
+        setResults(rawResults);
+        setFilteredCount(0);
+      } else {
+        const { passed, filtered } = filterScrapeResults(rawResults, config.minAgeDays);
+        setFilteredCount(filtered.length);
+        addLog(`Filtered out ${filtered.length} ads (agency/age/size)`, 'warning');
+        addLog(`${passed.length} leads ready for review`, 'success');
+        setResults(passed);
+      }
 
       if (runId) {
         await supabase.from('scrape_runs').update({
           leads_found: rawResults.length,
-          leads_filtered_out: filtered.length,
+          leads_filtered_out: config.bypassFilters ? 0 : filteredCount,
           status: 'completed',
           completed_at: new Date().toISOString(),
         }).eq('id', runId);

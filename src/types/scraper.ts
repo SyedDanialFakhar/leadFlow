@@ -3,6 +3,7 @@ export interface ScrapeConfig {
   city: 'Melbourne' | 'Sydney' | 'Brisbane';
   roleQuery: string;
   minAgeDays: number;
+  bypassFilters?: boolean;
 }
 
 export interface ScrapeResult {
