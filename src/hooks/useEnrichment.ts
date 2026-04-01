@@ -60,6 +60,7 @@ export function useEnrichment() {
     setIsEnriching(true);
     try {
       const role = getRecommendedContactRole(lead.companyEmployeeCount);
+      // Refined query: Company + Role + City for better accuracy
       const result = await searchApolloContact(lead.companyName, role, lead.city);
 
       if (result) {

@@ -4,9 +4,11 @@ export function getRecommendedContactRole(employeeCountStr: string | null): stri
   const parsed = parseEmployeeCount(employeeCountStr);
 
   if (parsed < 30) return 'Director or CEO';
-  if (parsed <= 100) return 'General Manager or Sales Manager';
+  if (parsed <= 100) return 'Sales Manager or General Manager';
   if (parsed <= 300) return 'HR Manager or People & Culture Manager';
-  return 'People & Culture Manager';
+  if (parsed <= 500) return 'People & Culture Manager';
+  
+  return 'People & Culture Manager'; // Default for 500+
 }
 
 export function parseEmployeeCount(str: string): number {

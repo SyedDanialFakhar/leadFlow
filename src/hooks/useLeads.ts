@@ -59,7 +59,7 @@ export function useLeads() {
     leads: leadsQuery.data ?? [],
     isLoading: leadsQuery.isLoading,
     error: leadsQuery.error,
-    stats: statsQuery.data ?? { total: 0, newToday: 0, awaitingEnrichment: 0, followUpNeeded: 0, converted: 0, called: 0 },
+    stats: statsQuery.data ?? { total: 0, newToday: 0, awaitingEnrichment: 0, followUpNeeded: 0, accepted: 0, rejected: 0, called: 0 },
     createLead: createMutation.mutateAsync,
     updateLead: updateMutation.mutateAsync,
     deleteLead: deleteMutation.mutateAsync,

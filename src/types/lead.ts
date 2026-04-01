@@ -1,5 +1,5 @@
 // src/types/lead.ts
-export type LeadStatus = 'new' | 'assessed' | 'called' | 'converted' | 'closed' | 'deleted';
+export type LeadStatus = 'new' | 'assessed' | 'called' | 'accepted' | 'rejected' | 'closed' | 'deleted';
 export type EnrichmentStatus = 'pending' | 'enriched' | 'not_found' | 'failed';
 export type Platform = 'seek' | 'linkedin';
 export type City = 'Melbourne' | 'Sydney' | 'Brisbane';
@@ -34,6 +34,9 @@ export interface Lead {
   emailSent: boolean;
   emailSentAt: string | null;
   followUpRequired: boolean;
+  followUpCount: number;
+  lastFollowUpAt: string | null;
+  rejectionReason: string | null;
   rawScrapeData: Record<string, unknown> | null;
 }
 
@@ -53,6 +56,7 @@ export interface LeadStats {
   newToday: number;
   awaitingEnrichment: number;
   followUpNeeded: number;
-  converted: number;
+  accepted: number;
+  rejected: number;
   called: number;
 }

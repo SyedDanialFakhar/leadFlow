@@ -1,6 +1,6 @@
 export const PLATFORMS = ['seek', 'linkedin'] as const;
 export const CITIES = ['Melbourne', 'Sydney', 'Brisbane'] as const;
-export const STATUSES = ['new', 'assessed', 'called', 'converted', 'closed', 'deleted'] as const;
+export const STATUSES = ['new', 'assessed' , 'called', 'accepted', 'rejected', 'closed', 'deleted'] as const;
 export const ENRICHMENT_STATUSES = ['pending', 'enriched', 'not_found', 'failed'] as const;
 
 export const ROLE_QUERIES = [
@@ -43,7 +43,8 @@ export const STATUS_COLORS: Record<string, string> = {
   new: 'bg-secondary text-secondary-foreground',
   assessed: 'bg-primary/10 text-primary',
   called: 'bg-warning/10 text-warning',
-  converted: 'bg-success/10 text-success font-semibold',
+  accepted: 'bg-success text-success-foreground font-semibold',
+  rejected: 'bg-destructive text-destructive-foreground font-semibold',
   closed: 'bg-muted text-muted-foreground',
   deleted: 'bg-destructive/10 text-destructive line-through',
 };

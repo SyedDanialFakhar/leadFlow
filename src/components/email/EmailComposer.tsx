@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { EmailTemplate, EmailQueueItem, EmailStats } from '@/types';
+import type { Lead, EmailTemplate, EmailQueueItem, EmailStats } from '@/types';
 import { StatusBadge } from '@/components/leads/LeadStatusBadge';
 import { formatDateTime } from '@/utils/dateUtils';
 import { Spinner } from '@/components/ui/Spinner';
@@ -14,14 +14,16 @@ interface EmailComposerProps {
   onSendAll: () => Promise<{ sent: number; failed: number } | undefined>;
   onSendSingle: (item: EmailQueueItem) => Promise<void>;
   isLoading: boolean;
+  leadsDue: Lead[];
+  onAddFollowUp: (lead: Lead) => Promise<void>;
 }
 
 export function EmailComposer({
   template, onTemplateChange, queue, stats,
-  onSendAll, onSendSingle, isLoading,
+  onSendAll, onSendSingle, isLoading, leadsDue, onAddFollowUp
 }: EmailComposerProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'template' | 'queue' | 'log'>('template');
+  const [activeTab, setActiveTab] = useState<'template' | 'queue' | 'due' | 'log'>('template');
 
   const inputCls = 'w-full rounded-lg border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary';
 
@@ -45,7 +47,7 @@ export function EmailComposer({
 
       {/* Tabs */}
       <div className="flex gap-1 rounded-lg bg-muted p-1">
-        {(['template', 'queue', 'log'] as const).map((tab) => (
+        {(['template', 'queue', 'due', 'log'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -53,7 +55,7 @@ export function EmailComposer({
               activeTab === tab ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            {tab}
+            {tab === 'due' ? `Due (${leadsDue.length})` : tab}
           </button>
         ))}
       </div>
@@ -135,6 +137,52 @@ export function EmailComposer({
                     </td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'due' && (
+        <div className="rounded-xl border bg-card shadow-sm">
+          <div className="border-b px-5 py-3">
+            <h3 className="font-semibold text-card-foreground">Leads Due for Follow-up</h3>
+            <p className="text-xs text-muted-foreground">Leads that haven't responded in 7+ days</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-left text-xs font-medium text-muted-foreground">
+                  <th className="px-5 py-3">Lead</th>
+                  <th className="px-5 py-3">Current Step</th>
+                  <th className="px-5 py-3">Last Activity</th>
+                  <th className="px-5 py-3">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leadsDue.map((lead) => (
+                  <tr key={lead.id} className="border-b last:border-0 hover:bg-muted/30">
+                    <td className="px-5 py-3">
+                      <p className="font-medium text-card-foreground">{lead.contactName || lead.companyName}</p>
+                      <p className="text-xs text-muted-foreground">{lead.contactEmail}</p>
+                    </td>
+                    <td className="px-5 py-3">
+                      <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">Email {lead.followUpCount}</span>
+                    </td>
+                    <td className="px-5 py-3 text-xs text-muted-foreground">{lead.lastFollowUpAt ? formatDateTime(lead.lastFollowUpAt) : '—'}</td>
+                    <td className="px-5 py-3">
+                      <button
+                        onClick={() => onAddFollowUp(lead)}
+                        className="rounded bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:opacity-90"
+                      >
+                        Queue Email {lead.followUpCount + 1}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {leadsDue.length === 0 && (
+                  <tr><td colSpan={4} className="py-12 text-center text-muted-foreground">No leads due for follow-up</td></tr>
+                )}
               </tbody>
             </table>
           </div>

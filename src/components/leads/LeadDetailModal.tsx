@@ -101,6 +101,9 @@ export function LeadDetailModal({ lead, isOpen, onClose, onUpdate }: LeadDetailM
           {lead.followUpRequired && (
             <span className="text-xs font-medium text-warning">Follow-up needed</span>
           )}
+          {lead.followUpCount > 0 && (
+            <span className="text-xs font-medium text-primary">Email Step: {lead.followUpCount}/3</span>
+          )}
         </div>
 
         {/* Status change */}
@@ -115,14 +118,30 @@ export function LeadDetailModal({ lead, isOpen, onClose, onUpdate }: LeadDetailM
                 className={cn(
                   'rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition-colors',
                   lead.status === s
-                    ? 'bg-primary text-primary-foreground'
+                    ? (s === 'accepted' ? 'bg-success text-success-foreground' : s === 'rejected' ? 'bg-destructive text-destructive-foreground' : 'bg-primary text-primary-foreground')
                     : 'bg-muted text-muted-foreground hover:bg-muted/80',
                 )}
               >
-                {s}
+                {s === 'accepted' ? 'Success / Accepted' : s}
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Rejection / Follow-up Details */}
+        <div className="grid grid-cols-2 gap-4 border-t pt-4">
+          {lead.status === 'rejected' && (
+            <div className="col-span-2">
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Rejection Reason</label>
+              <textarea
+                className="w-full rounded-lg border bg-muted/50 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-destructive"
+                placeholder="Why did they reject? (e.g. Too expensive, Not interested now)"
+                value={lead.rejectionReason ?? ''}
+                onChange={(e) => onUpdate(lead.id, { rejectionReason: e.target.value })}
+              />
+            </div>
+          )}
+          {lead.lastFollowUpAt && <Field label="Last Follow-up Sent" value={formatDate(lead.lastFollowUpAt)} />}
         </div>
 
         {/* Comments */}

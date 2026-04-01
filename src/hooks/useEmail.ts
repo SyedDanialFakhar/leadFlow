@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchEmailQueue, getEmailsSentToday, addToEmailQueue, sendQueuedEmail, sendAllQueued } from '@/services/emailService';
+import { fetchEmailQueue, getEmailsSentToday, addToEmailQueue, sendQueuedEmail, sendAllQueued, getLeadsDueForFollowUp } from '@/services/emailService';
 import type { Lead, EmailTemplate, EmailQueueItem } from '@/types';
 import { DAILY_EMAIL_LIMIT } from '@/utils/constants';
 
@@ -30,6 +30,13 @@ export function useEmail() {
 
   const queue = queueQuery.data ?? [];
   const sentToday = sentTodayQuery.data ?? 0;
+
+  const dueQuery = useQuery({
+    queryKey: ['leads-due-follow-up'],
+    queryFn: getLeadsDueForFollowUp,
+  });
+
+  const leadsDue = dueQuery.data ?? [];
 
   const stats = {
     sentToday,
@@ -72,10 +79,11 @@ export function useEmail() {
     queue,
     stats,
     template,
+    leadsDue,
     setTemplate,
     addToQueue: addLead,
     sendSingle,
     sendAll,
-    isLoading: queueQuery.isLoading || isSending,
+    isLoading: queueQuery.isLoading || isSending || dueQuery.isLoading,
   };
 }

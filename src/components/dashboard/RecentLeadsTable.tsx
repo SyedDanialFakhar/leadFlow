@@ -20,21 +20,28 @@ export function RecentLeadsTable({ leads }: RecentLeadsTableProps) {
             <tr className="border-b text-left text-xs font-medium text-muted-foreground">
               <th className="px-5 py-3">Company</th>
               <th className="px-5 py-3">Contact</th>
-              <th className="px-5 py-3">Platform</th>
-              <th className="px-5 py-3">City</th>
+              <th className="px-5 py-3">Job Title</th>
+              <th className="px-5 py-3">Phone</th>
+              <th className="px-5 py-3">Email</th>
               <th className="px-5 py-3">Status</th>
-              <th className="px-5 py-3">Date</th>
+              <th className="px-5 py-3">Date Posted</th>
             </tr>
           </thead>
           <tbody>
             {recent.map((lead) => (
               <tr key={lead.id} className="border-b last:border-0 hover:bg-muted/30">
-                <td className="px-5 py-3 font-medium text-card-foreground">{lead.companyName}</td>
+                <td className="px-5 py-3 font-medium text-card-foreground">
+                  <div className="flex flex-col">
+                    <span>{lead.companyName}</span>
+                    <span className="text-[10px] text-muted-foreground uppercase">{lead.city} • {lead.platform}</span>
+                  </div>
+                </td>
                 <td className="px-5 py-3 text-muted-foreground">{lead.contactName ?? '—'}</td>
-                <td className="px-5 py-3 capitalize text-muted-foreground">{lead.platform}</td>
-                <td className="px-5 py-3 text-muted-foreground">{lead.city}</td>
+                <td className="px-5 py-3 text-muted-foreground truncate max-w-[150px]">{lead.jobTitle}</td>
+                <td className="px-5 py-3 text-muted-foreground whitespace-nowrap">{lead.contactPhone ?? '—'}</td>
+                <td className="px-5 py-3 text-muted-foreground">{lead.contactEmail ?? '—'}</td>
                 <td className="px-5 py-3"><StatusBadge status={lead.status} /></td>
-                <td className="px-5 py-3 text-muted-foreground">{formatDate(lead.datePosted)}</td>
+                <td className="px-5 py-3 text-muted-foreground whitespace-nowrap">{formatDate(lead.datePosted)}</td>
               </tr>
             ))}
             {recent.length === 0 && (

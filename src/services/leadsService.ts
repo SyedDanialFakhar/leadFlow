@@ -22,7 +22,8 @@ export async function fetchLeadStats(): Promise<LeadStats> {
     newToday: leads.filter((l) => l.createdAt.startsWith(today)).length,
     awaitingEnrichment: leads.filter((l) => l.enrichmentStatus === 'pending').length,
     followUpNeeded: leads.filter((l) => l.followUpRequired && !l.emailSent).length,
-    converted: leads.filter((l) => l.status === 'converted').length,
+    accepted: leads.filter((l) => l.status === 'accepted').length,
+    rejected: leads.filter((l) => l.status === 'rejected').length,
     called: leads.filter((l) => l.status === 'called').length,
   };
 }
@@ -40,6 +41,16 @@ export async function createLead(lead: Partial<Lead>): Promise<Lead> {
 }
 
 export async function updateLead(id: string, updates: Partial<Lead>): Promise<Lead> {
+  // Automatic follow-up logic: IF status = called AND no email sent yet AND email exists THEN follow_up_required = true
+  if (updates.status === 'called' || (updates as any).enrichmentStatus === 'enriched' || updates.contactEmail) {
+    const { data: current } = await supabase.from('leads').select('email_sent, contact_email, follow_up_required').eq('id', id).single();
+    if (current && !current.email_sent && (updates.contactEmail || current.contact_email)) {
+      if (updates.status === 'called') {
+        updates.followUpRequired = true;
+      }
+    }
+  }
+
   const dbRow = leadToDbRow(updates);
   const { data, error } = await supabase
     .from('leads')
@@ -58,9 +69,29 @@ export async function deleteLead(id: string): Promise<void> {
 }
 
 export async function bulkUpdateLeadStatus(ids: string[], status: Lead['status']): Promise<void> {
+  const updates: any = { status, updated_at: new Date().toISOString() };
+  
+  if (status === 'called') {
+    // For bulk updates, we'll set follow_up_required if an email exists and hasn't been sent
+    // Note: This is a simpler version for bulk to avoid complex joins in a single update
+    const { error } = await supabase
+      .from('leads')
+      .update({ 
+        status, 
+        follow_up_required: true,
+        updated_at: new Date().toISOString() 
+      })
+      .in('id', ids)
+      .eq('email_sent', false)
+      .not('contact_email', 'is', null);
+      
+    if (error) throw new Error(`Failed to bulk update: ${error.message}`);
+    return;
+  }
+
   const { error } = await supabase
     .from('leads')
-    .update({ status, updated_at: new Date().toISOString() })
+    .update(updates)
     .in('id', ids);
 
   if (error) throw new Error(`Failed to bulk update: ${error.message}`);

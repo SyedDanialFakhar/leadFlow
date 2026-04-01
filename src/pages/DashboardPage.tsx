@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { RecentLeadsTable } from '@/components/dashboard/RecentLeadsTable';
 import { Spinner } from '@/components/ui/Spinner';
-import { Users, UserPlus, Sparkles, PhoneCall, CheckCircle, Clock } from 'lucide-react';
+import { Users, UserPlus, Sparkles, PhoneCall, CheckCircle, Clock, X } from 'lucide-react';
 
 export default function DashboardPage() {
   const { leads, stats, isLoading } = useLeads();
@@ -19,7 +19,8 @@ export default function DashboardPage() {
         <StatsCard label="New Today" value={stats.newToday} icon={UserPlus} color="text-primary" />
         <StatsCard label="Awaiting Enrichment" value={stats.awaitingEnrichment} icon={Sparkles} color="text-warning" />
         <StatsCard label="Follow-Up Needed" value={stats.followUpNeeded} icon={Clock} color="text-warning" />
-        <StatsCard label="Converted" value={stats.converted} icon={CheckCircle} color="text-success" />
+        <StatsCard label="Accepted / Offers" value={stats.accepted} icon={CheckCircle} color="text-success" />
+        <StatsCard label="Rejected" value={stats.rejected} icon={X} color="text-destructive" />
         <StatsCard label="Called" value={stats.called} icon={PhoneCall} color="text-primary" />
       </div>
       <RecentLeadsTable leads={leads} />

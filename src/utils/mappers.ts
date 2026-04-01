@@ -32,6 +32,9 @@ export function dbRowToLead(row: Record<string, unknown>): Lead {
     emailSent: (row.email_sent as boolean) ?? false,
     emailSentAt: (row.email_sent_at as string) ?? null,
     followUpRequired: (row.follow_up_required as boolean) ?? false,
+    followUpCount: (row.follow_up_count as number) ?? 0,
+    lastFollowUpAt: (row.last_follow_up_at as string) ?? null,
+    rejectionReason: (row.rejection_reason as string) ?? null,
     rawScrapeData: (row.raw_scrape_data as Record<string, unknown>) ?? null,
   };
 }
@@ -64,6 +67,9 @@ export function leadToDbRow(lead: Partial<Lead>): Record<string, unknown> {
   if (lead.emailSent !== undefined) map.email_sent = lead.emailSent;
   if (lead.emailSentAt !== undefined) map.email_sent_at = lead.emailSentAt;
   if (lead.followUpRequired !== undefined) map.follow_up_required = lead.followUpRequired;
+  if (lead.followUpCount !== undefined) map.follow_up_count = lead.followUpCount;
+  if (lead.lastFollowUpAt !== undefined) map.last_follow_up_at = lead.lastFollowUpAt;
+  if (lead.rejectionReason !== undefined) map.rejection_reason = lead.rejectionReason;
   if (lead.rawScrapeData !== undefined) map.raw_scrape_data = lead.rawScrapeData;
   map.updated_at = new Date().toISOString();
   return map;

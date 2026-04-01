@@ -46,9 +46,8 @@ export function LeadTable({ leads, selectedIds, onSelect, onClickLead, onStatusC
               <th className="px-4 py-3">Company</th>
               <th className="px-4 py-3">Job Title</th>
               <th className="px-4 py-3">Contact</th>
+              <th className="px-4 py-3">Phone</th>
               <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Platform</th>
-              <th className="px-4 py-3">City</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Enrichment</th>
             </tr>
@@ -61,19 +60,24 @@ export function LeadTable({ leads, selectedIds, onSelect, onClickLead, onStatusC
                 className={cn(
                   'cursor-pointer border-b last:border-0 hover:bg-muted/30 transition-colors',
                   lead.followUpRequired && 'border-l-2 border-l-warning',
-                  lead.status === 'converted' && 'border-l-2 border-l-success',
+                  lead.status === 'accepted' && 'border-l-2 border-l-success',
+                  lead.status === 'rejected' && 'border-l-2 border-l-destructive',
                 )}
               >
                 <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                   <input type="checkbox" checked={selectedIds.includes(lead.id)} onChange={() => toggleOne(lead.id)} />
                 </td>
                 <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{formatDate(lead.datePosted)}</td>
-                <td className="px-4 py-3 font-medium text-card-foreground">{lead.companyName}</td>
+                <td className="px-4 py-3 font-medium text-card-foreground">
+                  <div className="flex flex-col">
+                    <span>{lead.companyName}</span>
+                    <span className="text-[10px] text-muted-foreground uppercase">{lead.city} • {lead.platform}</span>
+                  </div>
+                </td>
                 <td className="px-4 py-3 text-muted-foreground">{lead.jobTitle}</td>
                 <td className="px-4 py-3 text-muted-foreground">{lead.contactName ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{lead.contactPhone ?? '—'}</td>
                 <td className="px-4 py-3 text-muted-foreground text-xs">{lead.contactEmail ?? '—'}</td>
-                <td className="px-4 py-3 capitalize text-muted-foreground">{lead.platform}</td>
-                <td className="px-4 py-3 text-muted-foreground">{lead.city}</td>
                 <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                   <select
                     value={lead.status}
